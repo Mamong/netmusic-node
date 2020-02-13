@@ -221,7 +221,7 @@ app.get(dir + '/recommend/dislike', function(request, response) {
 	createWebAPIRequest('/weapi/discovery/recommend/dislike', data, cookie, response)
 });
 
-//  每日推荐歌单
+//  每日推荐
 app.get(dir + '/recommend/resource', function(request, response) {
 	var cookie = request.get('Cookie') ? request.get('Cookie') : (request.query.cookie ? request.query.cookie : '');
 	var data = {
@@ -396,6 +396,22 @@ app.get(dir + '/top/playlist/highquality', function(request, response) {
 	var cookie = request.get('Cookie') ? request.get('Cookie') : (request.query.cookie ? request.query.cookie : '');
 	createWebAPIRequest('/weapi/playlist/highquality/list', data, cookie, response);
 });
+
+//歌单心动模式/智能播放
+app.get(dir + '/playmode/intelligence/list', function(request, response) {
+	var data = {
+		'songId': request.query.id,
+		'type': 'fromPlayOne',
+    		'playlistId': request.query.pid,
+                'startMusicId': request.query.sid || request.query.id,
+    		'count': request.query.count || 1
+		"csrf_token": ""
+	}
+	var cookie = request.get('Cookie') ? request.get('Cookie') : (request.query.cookie ? request.query.cookie : '');
+	createWebAPIRequest('/weapi/playmode/intelligence/list', data, cookie, response);
+});
+
+
 //simi ,相似歌单，歌曲，关注的用户
 app.get(dir + '/simi/playlist', function(request, response) {
 	var data = {
