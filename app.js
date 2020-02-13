@@ -29,7 +29,7 @@ function createWebAPIRequest(path, data, c, response, method) {
 			'Content-Type': 'application/x-www-form-urlencoded',
 			'Referer': 'http://music.163.com',
 			'Host': 'music.163.com',
-			'Cookie': cookie,
+			'Cookie': baseCookie + (cookie ? "; " : "") +  cookie,
 			'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/602.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/602.1'
 		}
 	}, function(res) {
