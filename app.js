@@ -616,14 +616,17 @@ app.get(dir + '/music/detail', function(request, response) {
 		"ids": '[' + id + ']',
 		"csrf_token": ""
 	};*/
+	console.log("收到歌曲详情请求");
 	var ids = request.query.ids.split(/\s*,\s*/);
 	const data = {
 	   'c': '[' + ids.map(id => ('{"id":' + id + '}')).join(',') + ']',
 	   "ids": '[' + ids.join(',') + ']',
 	   "csrf_token": ""
 	};
+	console.log("处理歌曲详情请求");
 	var cookie = request.get('Cookie') ? request.get('Cookie') : (request.query.cookie ? request.query.cookie : '');
 	createWebAPIRequest('/weapi/v3/song/detail', data, cookie, response)
+	console.log("完成歌曲详情转发");
 });
 //专辑详情
 app.get(dir + '/album/detail', function(request, response) {
