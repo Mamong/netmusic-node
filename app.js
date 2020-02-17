@@ -607,7 +607,7 @@ app.get(dir + '/mv/url', function(request, response) {
 });
 //单曲详情
 app.get(dir + '/music/detail', function(request, response) {
-	var id = parseInt(request.query.id);
+	/*var id = parseInt(request.query.id);
 	var data = {
 		"id": id,
 		'c': JSON.stringify([{
@@ -615,6 +615,12 @@ app.get(dir + '/music/detail', function(request, response) {
 		}]),
 		"ids": '[' + id + ']',
 		"csrf_token": ""
+	};*/
+	var ids = request.query.ids.split(/\s*,\s*/);
+	const data = {
+	   'c': '[' + ids.map(id => ('{"id":' + id + '}')).join(',') + ']',
+	   "ids": '[' + ids.join(',') + ']',
+	   "csrf_token": ""
 	};
 	var cookie = request.get('Cookie') ? request.get('Cookie') : (request.query.cookie ? request.query.cookie : '');
 	createWebAPIRequest('/weapi/v3/song/detail', data, cookie, response)
