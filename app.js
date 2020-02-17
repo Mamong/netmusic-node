@@ -404,7 +404,7 @@ app.get(dir + '/playmode/intelligence/list', function(request, response) {
 		'type': 'fromPlayOne',
     		'playlistId': request.query.pid,
                 'startMusicId': request.query.sid || request.query.id,
-    		'count': request.query.count || 1
+    		'count': request.query.count || 1,
 		"csrf_token": ""
 	}
 	var cookie = request.get('Cookie') ? request.get('Cookie') : (request.query.cookie ? request.query.cookie : '');
