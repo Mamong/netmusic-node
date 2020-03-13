@@ -6,7 +6,7 @@ var reqhttp = require("request");
 var app = express();
 var dir = "/v1";
 var cookie = null;
-var user = {};
+var user = {};var num=0;
 var jsessionid = randomString('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKMNOPQRSTUVWXYZ\\/+',176) + ':' + (new Date).getTime(); 
 var nuid = randomString('0123456789abcdefghijklmnopqrstuvwxyz',32);
 function randomString(pattern, length){
@@ -29,7 +29,7 @@ function createWebAPIRequest(path, data, c, response, method) {
 			'Content-Type': 'application/x-www-form-urlencoded',
 			'Referer': 'http://music.163.com',
 			'Host': 'music.163.com',
-			'Cookie': baseCookie + (cookie ? "; " : "") +  cookie,
+			'Cookie': baseCookie + (c ? "; " : "") +  c,
 			'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/602.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/602.1'
 		}
 	}, function(res) {
@@ -37,24 +37,31 @@ function createWebAPIRequest(path, data, c, response, method) {
 			response.status(502).send('fetch error');
 		});
 		res.setEncoding('utf8');
+		console.log("res.statusCode:"+res.statusCode);
 		if(res.statusCode != 200) {
-			createWebAPIRequest(path, data, c, response, method);
+console.log("request not 200");
+			//createWebAPIRequest(path, data, cookie, response, method);
 			return;
 		} else {
 			res.on('data', function(chunk) {
 				music_req += chunk;
 			});
 			res.on('end', function() {
+num = num +1;
+                                console.log("NO."+num+" end:"+path+"data:"+JSON.stringify(data)+",result:"+music_req);
+
 				if(music_req == '') {
-					createWebAPIRequest(path, data, c, response, method);
+                                       console.log("empty end");
+				        createWebAPIRequest(path, data, c, response, method);
 					return;
 				}
 				if(res.headers['set-cookie']) {
 					cookie =baseCookie +';'+ res.headers['set-cookie'];
-					response.send({
+                                        response.send({
 						code: 200,
 						i: JSON.parse(music_req)
 					});
+                                        //console.log("finish send:"+path);
 					user = JSON.parse(music_req)
 					return;
 				}
@@ -99,6 +106,7 @@ app.get(dir + '/login/cellphone', function(request, response) {
 	var phone = request.query.phone;
 	var md5sum = crypto.createHash('md5');
 	md5sum.update(request.query.password);
+        console.log("pwd:"+request.query.password);
 	var data = {
 		'phone': phone,
 		'password': md5sum.digest('hex'),
@@ -616,14 +624,13 @@ app.get(dir + '/music/detail', function(request, response) {
 		"ids": '[' + id + ']',
 		"csrf_token": ""
 	};*/
-	console.log("收到歌曲详情请求");
 	var ids = request.query.ids.split(/\s*,\s*/);
 	const data = {
 	   'c': '[' + ids.map(id => ('{"id":' + id + '}')).join(',') + ']',
 	   "ids": '[' + ids.join(',') + ']',
 	   "csrf_token": ""
 	};
-	console.log("处理歌曲详情请求");
+	console.log("data:"+JSON.stringify(data));
 	var cookie = request.get('Cookie') ? request.get('Cookie') : (request.query.cookie ? request.query.cookie : '');
 	createWebAPIRequest('/weapi/v3/song/detail', data, cookie, response)
 	console.log("完成歌曲详情转发");
@@ -641,6 +648,11 @@ app.get(dir + '/album/detail', function(request, response) {
 app.get(dir + '/music/url', function(request, response) {
 	var id = parseInt(request.query.id);
 	var br = parseInt(request.query.br);
+        console.log("id:"+request.query.id);
+
+        console.log("origin url:"+request.originalUrl);
+        console.log("query:"+ JSON.stringify(request.query));
+        
 	var data = {
 		"ids": [id],
 		"br": br,
@@ -925,6 +937,7 @@ app.get(dir + '/song/tracks', function(request, response) {
 		"time": 2,
 		"csrf_token": ""
 	};
+        console.log("op:"+op+"pid:"+pid+"cookie:"+cookie);
 	createWebAPIRequest(url, data, cookie, response)
 });
 
@@ -1078,7 +1091,7 @@ app.get(dir + '/playlist/fav', function(request, response) {
 		id: request.query.id,
 		csrf_token: ''
 	}
-	var url = '/weapi/playlist/' + (request.query.type == 1 ? 'subscribe' : 'unsubscribe') + "?csrf_token=''";
+	var url = '/weapi/playlist/' + (request.query.type == 1 ? 'subscribe' : 'unsubscribe');// + "?csrf_token=''";
 	console.log(url);
 	createWebAPIRequest(url, data, cookie, response)
 })
